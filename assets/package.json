@@ -1,0 +1,25 @@
+{
+  "name": "elixir_todo_list",
+  "version": "1.0.0",
+  "scripts": {
+    "deploy": "NODE_ENV=production node ./build.js",
+    "watch": "node ./build.js --watch"
+  },
+  "dependencies": {
+    "@hotwired/turbo": "^8.0.12",
+    "@popperjs/core": "^2.11.8",
+    "phoenix": "file:../deps/phoenix",
+    "phoenix_html": "file:../deps/phoenix_html",
+    "phoenix_live_view": "file:../deps/phoenix_live_view",
+    "topbar": "^2.0.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.9",
+    "@tailwindcss/typography": "^0.5.15",
+    "autoprefixer": "^10.4.20",
+    "daisyui": "^4.12.10",
+    "esbuild": "^0.20.1",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.15"
+  }
+}
