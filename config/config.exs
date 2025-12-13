@@ -7,6 +7,12 @@
 # General application configuration
 import Config
 
+config :elixir_todo_list, ElixirTodoList.Repo,
+  database: "elixir_todo_list.db",
+  priv: "priv/repo"
+
+config :elixir_todo_list, ecto_repos: [ElixirTodoList.Repo]
+
 config :elixir_todo_list,
   generators: [timestamp_type: :utc_datetime]
 
