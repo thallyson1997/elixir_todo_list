@@ -1,82 +1,62 @@
 defmodule ElixirTodoListWeb.TodoLive do
   use ElixirTodoListWeb, :live_view
 
-  # @impl true → indicamos que esta função faz parte do comportamento LiveView
+  alias ElixirTodoList.Repo
+  alias ElixirTodoList.Task
+  import ElixirTodoListWeb.CoreComponents
+
   @impl true
   def mount(_params, _session, socket) do
-    # Nossa "memória" inicial: duas tarefas de exemplo
-    tasks = [
-      %{id: 1, title: "Comprar leite", completed: false},
-      %{id: 2, title: "Aprender LiveView", completed: true}
-    ]
+    tasks = Repo.all(Task)
+    changeset = Task.changeset(%Task{}, %{})
+    form = to_form(changeset)
 
-    # assign/3 coloca dados no socket (nosso estado de interface)
     socket =
       assign(socket,
         tasks: tasks,
-        new_task_title: "" # campo de texto começa vazio
+        form: form
       )
 
-    # {:ok, socket} → retorna o estado inicial ao LiveView
     {:ok, socket}
   end
 
-  # Captura o evento de digitação no campo
   @impl true
-  def handle_event("update_form", %{"title" => new_title}, socket) do
-    # Atualiza o valor do campo no estado
-    socket = assign(socket, new_task_title: new_title)
-    {:noreply, socket}  # retorna o socket atualizado sem recarregar a página
-  end
+  def handle_event("save_task", %{"task" => task_params}, socket) do
+    changeset = Task.changeset(%Task{}, task_params)
 
-  # Captura o evento de envio do formulário
-  @impl true
-  def handle_event("save_task", %{"title" => title}, socket) do
-    if String.trim(title) != "" do
-      # Cria uma nova tarefa "em memória"
-      new_task = %{
-        id: System.unique_integer([:positive]),
-        title: title,
-        completed: false
-      }
+    socket_atualizado =
+      case Repo.insert(changeset) do
+        {:ok, _new_task} ->
+          novo_changeset_vazio = Task.changeset(%Task{}, %{})
 
-      # Atualiza a lista de tarefas e limpa o campo
-      socket =
-        socket
-        |> update(:tasks, fn tasks -> tasks ++ [new_task] end)
-        |> assign(:new_task_title, "")
+          socket
+          |> assign(:tasks, Repo.all(Task))
+          |> assign(:form, to_form(novo_changeset_vazio))
+          |> put_flash(:info, "Tarefa salva com sucesso!")
 
-      {:noreply, socket}
-    else
-      # Ignora caso o campo esteja vazio
-      {:noreply, socket}
-    end
+        {:error, failed_changeset} ->
+          assign(socket, form: to_form(failed_changeset))
+      end
+
+    {:noreply, socket_atualizado}
   end
 
   @impl true
   def render(assigns) do
     ~H"""
     <div class="w-full max-w-lg mx-auto mt-12 p-6 bg-white rounded-lg shadow-md">
-      <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">
-        Minha Lista de Tarefas
-      </h1>
+      <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">Minha Lista de Tarefas (com DB!)</h1>
 
-      <%# --- FORMULÁRIO DE ENTRADA --- %>
-      <form phx-submit="save_task" phx-change="update_form" class="flex gap-2 mb-6">
-        <input
+      <.form for={@form} id="task-form" phx-submit="save_task">
+        <.input
+          field={@form[:title]}
           type="text"
-          name="title"
-          value={@new_task_title}
+          label="Nova Tarefa"
           placeholder="O que precisa ser feito?"
-          class="flex-grow p-2 border rounded"
-          autofocus
         />
-        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-          Adicionar
-        </button>
-      </form>
+        <.button phx-disable-with="Salvando...">Adicionar Tarefa</.button>
+      </.form>
 
-      <%# --- LISTA DE TAREFAS --- %>
       <div class="mt-8">
         <ul id="task-list">
           <li :for={task <- @tasks} class="flex justify-between items-center p-3 border-b">
