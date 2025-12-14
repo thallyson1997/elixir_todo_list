@@ -2,7 +2,9 @@
 
 **Aluno:** Thallyson Gabriel Martins Correia Fontenele
 
-**Link do Tutorial:** [Tutorial no Notion](https://www.notion.so/LINK_DO_TUTORIAL)
+**Matricula**: 2022024639
+
+**Link do Tutorial:** [Tutorial no Notion]([https://www.notion.so/LINK_DO_TUTORIAL](https://profsergiocosta.notion.site/Trabalho-em-Elixir-Desenvolvimento-de-um-Todo-List-com-LiveView-2a8cce97509380f4a8b9e71be3678fc5))
 
 ## 📋 Descrição
 
